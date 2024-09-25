@@ -677,8 +677,8 @@ class ArgHandler:
             global SERIAL_RATE
             SERIAL_RATE = args.speed
         if args.buffer:
-            global SERIAL_RATE
-            SERIAL_RATE = args.buffer
+            global BUFFER_FILE
+            BUFFER_FILE = args.buffer
 
 # main task launches the threads for the GUI, timer, input and serial listener
 def main():
