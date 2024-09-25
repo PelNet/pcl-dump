@@ -71,6 +71,9 @@ PREVIEW_NATIVE = True                           # enable or disable GUI automati
 PREVIEW_NATIVE_W = 544                          # initial width to which to scale the image for native previewing
 PREVIEW_NATIVE_H = 704                          # initial height to which to scale the image for native previewing
 NATIVE_LOGGER = True                            # whether to show the native logger output in the GUI
+COMMANDS_STARTUP = ['++srqauto 1\r\n', '++read\r\n', '++read\r\n']   # commands that are sent to the serial bus at startup
+COMMANDS_DELAY = 1.2                            # delay between commands executed (sent) to the serial bus
+
 
 # global event for pausing/resuming capture
 serialPause = Event()
@@ -235,6 +238,14 @@ class SerialListener:
         self.speed = speed
         self.bufferfile = bufferfile
         self.logger = logger
+        if not SERIAL_IGNORE == True:
+            try:
+                self.ser = serial.Serial(self.port, self.speed)
+            except OSError as err:
+                self.logger.printConsole("Failed to open interface " + self.port + " with error " + str(err) + "!", logToGUI=False)
+                self.logger.printConsole("Unable to continue, exiting...", logToGUI=False)
+                self.logger.printConsole("Goodbye", logToGUI=False)
+                os._exit(5)
         #self.listenSerial(self, serialPause)
 
     # start and stop serial input
@@ -248,17 +259,14 @@ class SerialListener:
             serialPause.set()
             self.logger.printConsole("Pause received, aborting capture...", GUIOnly=True)
 
+    # send message to serial bus
+    def sendMessage(self, command=''):
+        if not SERIAL_IGNORE == True:
+            self.ser.write(command.encode())
+
     # store serial input
     def listenSerial(self, serialPause=Event()):
         if not SERIAL_IGNORE == True:
-            try:
-                ser = serial.Serial(self.port, self.speed)
-            except OSError as err:
-                self.logger.printConsole("Failed to open interface " + self.port + " with error " + str(err) + "!")
-                self.logger.printConsole("Unable to continue, exiting...")
-                self.logger.printConsole("Goodbye")
-                os._exit(5)
-
             # open a file for writing
             try:
                 dumpfile = open(self.bufferfile, "wb")
@@ -269,7 +277,7 @@ class SerialListener:
                 os._exit(5)
             while True:
                 if not serialPause.is_set():
-                    databyte = ser.read(1)
+                    databyte = self.ser.read(1)
                     #print(databyte)
                     dumpfile.write(databyte)
                     dumpfile.flush()
@@ -697,6 +705,14 @@ def main():
 
     logger.printConsole("Hotkeys: [P] to [p]ause capture, [R] to [r]esume capture, [I] to display [i]nformation, [Q] to [q]uit", startNewLine=True)
     logger.printConsole("         Press [H] or [F1] for help")
+
+    # send optional startup commands to serial interface
+    if not SERIAL_IGNORE == True:
+        logger.printConsole("Executing any startup commands...")
+        for command in COMMANDS_STARTUP:
+            logger.printConsole("Sending startup command " + command.replace('\r', '').replace('\n', '') + "...")
+            serial.sendMessage(command=command)
+            time.sleep(COMMANDS_DELAY)
 
     # timer for serial monitor
     logger.printConsole("Starting timer thread...", startNewLine=True)

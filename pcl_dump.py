@@ -44,6 +44,8 @@ PNG_PHOSPHOR = True                             # use ImageMagick to convert PNG
 PNG_PHOSPHOR_CMD = '/usr/bin/convert'           # location of the ImageMagick binary for conversion
 PNG_PHOSPHOR_ARGS = "-alpha off -fill \"#00EE00\" -draw 'color 0,0 replace' +level-colors green,black -auto-level"  # arguments for phosphor conversion
 PREVIEW = True                                  # whether to automatically preview rendered files
+COMMANDS_STARTUP = ['++srqauto 1\r\n', '++read\r\n', '++read\r\n']   # commands that are sent to the serial bus at startup
+COMMANDS_DELAY = 1.2                            # delay between commands executed (sent) to the serial bus
 
 # global event for pausing/resuming capture
 serialPause = Event()
@@ -220,6 +222,13 @@ def listenSerial(serialPause):
             printConsole("Unable to continue, exiting...")
             printConsole("Goodbye")
             os._exit(5)
+
+        # send optional startup commands to serial interface
+        logger.printConsole("Executing any startup commands...")
+        for command in COMMANDS_STARTUP:
+            logger.printConsole("Sending startup command " + command.replace('\r', '').replace('\n', '') + "...")
+            ser.write(command.encode())
+            time.sleep(COMMANDS_DELAY)
 
         # open a file for writing
         try:
