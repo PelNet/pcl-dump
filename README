@@ -32,7 +32,7 @@
  * pcl_dump.py is a CLI only utility, plus and Pro have GUI's 
  * pcl_dump_plus.py is really just an intermediary step between the CLI only utility and Pro.
  * Skip "plus" and use pcl_dump.py for CLI only or pcl_dump_pro for a GUI.
- * This utility only *reads* the serial port, currently. No sending/reply is implemented.
+ * This utility only *reads* the serial port, currently. No sending/reply is implemented except for the startup commands.
  * You do NOT need the Linux GPIB driver, just a serial port. 
  * Target device was an HP 54645D scope. It may work for others. You may need to adjust some defaults.
  * To run multiple instances simultaneously, use the command lines args for separate buffers and ports.
