@@ -36,3 +36,9 @@
  * You do NOT need the Linux GPIB driver, just a serial port. 
  * Target device was an HP 54645D scope. It may work for others. You may need to adjust some defaults.
  * To run multiple instances simultaneously, use the command lines args for separate buffers and ports.
+
+
+ If the scope or instrument in question does not have a serial interface but support GPIB/HP-IB/IEEE488 
+ you could take a look at the AR488, a simple GPIB adapter which requires only a common microcontroller:
+
+ https://github.com/Twilight-Logic/AR488
