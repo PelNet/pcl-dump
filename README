@@ -35,4 +35,4 @@
  * This utility only *reads* the serial port, currently. No sending/reply is implemented.
  * You do NOT need the Linux GPIB driver, just a serial port. 
  * Target device was an HP 54645D scope. It may work for others. You may need to adjust some defaults.
- 
+ * To run multiple instances simultaneously, use the command lines args for separate buffers and ports.

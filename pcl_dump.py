@@ -186,7 +186,10 @@ def handleArgs():
     global version
     parser = argparse.ArgumentParser(description="PCL dump")
     parser.add_argument('-n', help='Ignore serial port absence', action="store_true")
-    parser.add_argument("-k", help="Keep buffer on disk", action="store_true")
+    parser.add_argument('-k', help='Keep buffer on disk', action="store_true")
+    parser.add_argument('-p', '--port', type=str, help="Override serial port", required=False)
+    parser.add_argument('-s', '--speed', type=int, help="Override buffer file", required=False)
+    parser.add_argument('-f', '--buffer', type=str, help="Override buffer file", required=False)
     parser.add_argument('-v', '--version', help='Show version and exit', default=False, action='version', version=version)
     args = parser.parse_args()
 
@@ -197,6 +200,15 @@ def handleArgs():
     if args.k:
         global KEEP_BUFFER
         KEEP_BUFFER = True
+    if args.port:
+        global SERIAL_PORT
+        SERIAL_PORT = args.port
+    if args.speed:
+        global SERIAL_RATE
+        SERIAL_RATE = args.speed
+    if args.buffer:
+        global BUFFER_FILE
+        BUFFER_FILE = args.buffer
 
 # store serial input
 def listenSerial(serialPause):

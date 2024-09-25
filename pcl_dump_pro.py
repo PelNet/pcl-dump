@@ -49,8 +49,8 @@ from PIL import Image, ImageTk      # image support
 import fitz                         # PDF support
 
 # config parameters
-SERIAL_PORT = '/dev/ttyACM0'                    # serial port to use
-SERIAL_RATE = 19200                             # BAUD rate. HP 54645D goes up to 19200
+SERIAL_PORT = '/dev/ttyACM1'                    # serial port to use
+SERIAL_RATE = 115200                             # BAUD rate. HP 54645D goes up to 19200
 SERIAL_IGNORE = False                           # bypass attaching to the serial interface
 BUFFER_FILE = '/tmp/scope.dump'                 # data buffer file on disk
 KEEP_BUFFER = False                             # keep the buffer (disk only), can be used for debugging or batch jobs
@@ -621,23 +621,6 @@ class Input(Logger, SerialListener):
         elif (command == 'start'):
             self.seriallistener.startStopSerial(mode='start')
 
-    # handle command args
-    def handleArgs(event):
-        global version
-        parser = argparse.ArgumentParser(description="PCL dump")
-        parser.add_argument('-n', help='Ignore serial port absence', action="store_true")
-        parser.add_argument("-k", help="Keep buffer on disk", action="store_true")
-        parser.add_argument('-v', '--version', help='Show version and exit', default=False, action='version', version=version)
-        args = parser.parse_args()
-
-        # set flags accordingly
-        if args.n:
-            global SERIAL_IGNORE
-            SERIAL_IGNORE = True
-        if args.k:
-            global KEEP_BUFFER
-            KEEP_BUFFER = True
-
     # show operating parameters
     def displayParams(self):
         self.logger.printConsole("Serial params:        " + SERIAL_PORT + " @ " + str(SERIAL_RATE) + " using a " + str(TIMEOUT_S) + "s timeout", startNewLine=True)
@@ -666,9 +649,42 @@ class Input(Logger, SerialListener):
         self.logger.printConsole("HP PCL dump - version " + version, startNewLine=True)
         return
 
+class ArgHandler:
+
+    # handle command args
+    def handleArgs(event):
+        global version
+        parser = argparse.ArgumentParser(description="PCL dump")
+        parser.add_argument('-n', help='Ignore serial port absence', action="store_true")
+        parser.add_argument('-k', help='Keep buffer on disk', action="store_true")
+        parser.add_argument('-p', '--port', type=str, help="Override serial port", required=False)
+        parser.add_argument('-s', '--speed', type=int, help="Override buffer file", required=False)
+        parser.add_argument('-f', '--buffer', type=str, help="Override buffer file", required=False)
+        parser.add_argument('-v', '--version', help='Show version and exit', default=False, action='version', version=version)
+        args = parser.parse_args()
+
+        # set flags accordingly
+        if args.n:
+            global SERIAL_IGNORE
+            SERIAL_IGNORE = True
+        if args.k:
+            global KEEP_BUFFER
+            KEEP_BUFFER = True
+        if args.port:
+            global SERIAL_PORT
+            SERIAL_PORT = args.port
+        if args.speed:
+            global SERIAL_RATE
+            SERIAL_RATE = args.speed
+        if args.buffer:
+            global SERIAL_RATE
+            SERIAL_RATE = args.buffer
+
 # main task launches the threads for the GUI, timer, input and serial listener
 def main():
     root = tk.Tk()  # define root window in order to be able to create global StringVars
+    args = ArgHandler()
+    args.handleArgs()
     main_gui = GUI(root)
     logger = Logger(gui=main_gui, timestamps=OUTPUT_DATETIME)
     serial = SerialListener(port=SERIAL_PORT, speed=SERIAL_RATE, bufferfile=BUFFER_FILE, logger=logger)
@@ -676,8 +692,7 @@ def main():
     main_gui.mainWindow(root, input)
     input.displayVersion()
 
-    # display config parameters and parse arguments
-    input.handleArgs()
+    # display config
     input.displayParams()
 
     logger.printConsole("Hotkeys: [P] to [p]ause capture, [R] to [r]esume capture, [I] to display [i]nformation, [Q] to [q]uit", startNewLine=True)
