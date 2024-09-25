@@ -347,19 +347,19 @@ class Trace():
         try:
             subprocess.check_output(render_command, shell=True)
         except subprocess.CalledProcessError as err:
-            self.logger.printConsole("ERROR: Failed to decode PCL using \"" + PCL_BINARY + "\" with error " + str(err) + "!", startNewLine=True, newLine=True)
+            self.logger.printConsole("ERROR: Failed to decode PCL using \"" + PCL_BINARY + "\" with error " + str(err) + "!", startNewLine=True)
         if CONV_FORMAT == 'png' and PNG_PHOSPHOR == True:
             self.logger.printConsole("Phosphor PNG mode enabled, processing...", startNewLine=True)
             try:
                 subprocess.run(PNG_PHOSPHOR_CMD + ' ' + file_name + ' ' + PNG_PHOSPHOR_ARGS + ' ' + file_name, shell=True)
             except OSError as err:
-                self.logger.printConsole("ERROR: Failed to run phosphor processing on file \"" + file_name + "\" with error " + str(err) + "!", startNewLine=True, newLine=True)
+                self.logger.printConsole("ERROR: Failed to run phosphor processing on file \"" + file_name + "\" with error " + str(err) + "!", startNewLine=True)
         if PREVIEW == True and not PREVIEW_NATIVE == True:
             self.logger.printConsole("Rendered file, launching viewer...", startNewLine=True)
             try:
                 subprocess.check_output(FILE_VIEWER + " " + file_name, shell=True)
             except subprocess.CalledProcessError as err:
-                self.logger.printConsole("WARNING: Failed to launch viewer \"" + FILE_VIEWER + "\" with error " + str(err) + "!", startNewLine=True, newLine=True)
+                self.logger.printConsole("WARNING: Failed to launch viewer \"" + FILE_VIEWER + "\" with error " + str(err) + "!", startNewLine=True)
         elif PREVIEW_NATIVE == True:
             if CONV_FORMAT == 'png':
                 self.previewImage(file_name)
@@ -369,7 +369,6 @@ class Trace():
             self.logger.printConsole("Preview disabled, proceeding...", startNewLine=True)
 
     # preview window for PNG
-    #def previewImage(self, file='logo.png'):
     def previewImage(self, file='logo.png'):
 
         # dynamically resize (a copy of) the image
@@ -523,7 +522,7 @@ class Trace():
     # handle events for closing
     def handleEvents(self):
         while True:
-            time.sleep(0.5) # back off to prevent hogging a CPU cure
+            time.sleep(0.5) # back off to prevent hogging a CPU core
             global eventCloseTraces
             if eventCloseTraces.is_set():
                 self.window.destroy()
