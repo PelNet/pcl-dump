@@ -204,13 +204,13 @@ def handleArgs():
         KEEP_BUFFER = True
     if args.p:
         global SERIAL_PORT
-        SERIAL_PORT = args.port
+        SERIAL_PORT = args.p
     if args.s:
         global SERIAL_RATE
-        SERIAL_RATE = args.speed
+        SERIAL_RATE = args.s
     if args.f:
         global BUFFER_FILE
-        BUFFER_FILE = args.buffer
+        BUFFER_FILE = args.f
 
 # store serial input
 def listenSerial(serialPause):
