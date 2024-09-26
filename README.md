@@ -5,6 +5,8 @@
  handled or addressed currently. When a job is considered complete, a binary (gpcl6 from the Ghostscript project is currently used) is called to convert the PCL datafile into a human
  readable format. While logic is in place for byte-by-byte parsing in order to detect discrete beginning and endings of jobs, these do not appear to exist, or come in the shape of out-of-band
  signalling on the serial line.
+
+ ![Screenshot of PCL dump Pro in action](https://github.com/PelNet/pcl-dump/blob/916e82095b6e2bce3c606d685a1ff4a72f613091/traces/pcl_dump_pro.jpg)
  
  PDF is the preferred conversion target, but PNG is available, too. Adjust the PCL_ARGS accordingly depending on the arguments used.
  
