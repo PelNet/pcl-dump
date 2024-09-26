@@ -113,7 +113,7 @@
  
  `BUFFER_FILE = '/tmp/scope.dump'`               # data buffer file on disk, can be overridden with `-f`
  
- `KEEP_BUFFER = False`                           # keep the buffer (disk only) for debugging or batch jobs, can be overridden by using `-f`
+ `KEEP_BUFFER = False`                           # keep the buffer (disk only) for debugging or batch jobs, can be overridden by using `-k`
  
  `TIMEOUT_S = 2`                                 # timeout before rendering job in seconds. You may need to increase this timeout for devices that have gaps in their output
  
