@@ -15,18 +15,13 @@
 # specified. This allows another process to write raw PCL to the buffer file in order for PCL dump
 # to render it.
 #
-# ## Plus
+# ## Pro
 #
-# PCL dump + (plus) is an expansion on the original PCL dump utility, but featuring a GUI for mouse,
+# PCL dump Pro builds on the original PCL dump utility, but featuring a GUI for mouse,
 # touchscreen or hotkey input. While STDOUT and STDERR remain identical to PCL dump, plus focuses on
 # presenting all typically useful output to the GUI, too. It allows (single page) PDF and PNG files
 # to be previewed directly when received or from saved traces on disk. PDF is highly recommended.
-#
-# ## Pro
-#
-# PCL dump Pro builds on the original PCL dump utility with the GUI and hotkeys from PCL dump plus.
-# It features a modular, class based approach while remaining identical in functionality. This allows
-# some minor improvements to the key bindings in preview windows and re-usage of the code if desired.
+# It features a modular, class based approach while remaining identical in functionality.
 #
 # PelliX 2024
 #
@@ -39,7 +34,7 @@ from threading import Thread, Event # support for timer, input and serial thread
 import subprocess                   # launch external commands
 import sys, termios, tty            # keyboard input together with os and time
 
-# Plus requirements
+# Pro requirements
 import tkinter as tk                # GUI elements
 from tkinter import ttk
 from tkinter import messagebox as mb
@@ -50,7 +45,7 @@ import fitz                         # PDF support
 
 # config parameters
 SERIAL_PORT = '/dev/ttyACM1'                    # serial port to use
-SERIAL_RATE = 115200                             # BAUD rate. HP 54645D goes up to 19200
+SERIAL_RATE = 115200                            # BAUD rate. HP 54645D goes up to 19200, AR488 is at 115200:q
 SERIAL_IGNORE = False                           # bypass attaching to the serial interface
 BUFFER_FILE = '/tmp/scope.dump'                 # data buffer file on disk
 KEEP_BUFFER = False                             # keep the buffer (disk only), can be used for debugging or batch jobs
@@ -75,7 +70,7 @@ COMMANDS_STARTUP = ['++srqauto 1\r\n', '++read\r\n', '++read\r\n']   # commands 
 COMMANDS_DELAY = 1.2                            # delay between commands executed (sent) to the serial bus
 
 
-# global event for pausing/resuming capture
+# global events for pausing/resuming capture and closing trace windows
 serialPause = Event()
 eventCloseTraces = Event()
 version = 'Pro 1.1'
@@ -88,6 +83,7 @@ class GUI(tk.Tk):
         self.status_bytes = tk.StringVar()
         self.status_last_capture = tk.StringVar()
         self.text_area = ''
+        self.root = root
 
     # display the main GUI
     def mainWindow(self, root, input):
@@ -144,6 +140,8 @@ class GUI(tk.Tk):
         tk.Label(tool_bar, textvariable=self.status_bytes, width=25, height=1, background='black', foreground='#0F0', font=("TkFixedFont", 12)).grid(row=8, column=0, padx=10, pady=8, columnspan=2)
         tk.Label(tool_bar, textvariable=self.status_last_capture, width=25, height=1, background='black', foreground='#0F0', font=("TkFixedFont", 12)).grid(row=9, column=0, padx=10, pady=8, columnspan=2)
         self.status_last_capture.set('No captures in session')
+        self.status_serial.set('Loading...')
+        self.status_bytes.set('Loading...')
 
         # hotkeys serial control
         root.bind('p', lambda event: input.serialControl(command='stop'))
@@ -230,6 +228,10 @@ class GUI(tk.Tk):
         self.text_area.see(tk.END)
         self.text_area.configure(state="disabled")
 
+    # wrapper to refresh the GUI
+    def refresh(self):
+        self.root.update_idletasks()
+
 # serial handling
 class SerialListener:
 
@@ -254,7 +256,7 @@ class SerialListener:
         if mode == 'start':
             self.clearBuffer()
             serialPause.clear()
-            self.logger.printConsole("Resume received, resuming serial capture...", GUIOnly=True)
+            self.logger.printConsole("Resume received, resuming capture...", GUIOnly=True)
         elif mode == 'stop':
             serialPause.set()
             self.logger.printConsole("Pause received, aborting capture...", GUIOnly=True)
@@ -295,7 +297,7 @@ class SerialListener:
         self.gui = gui
         while True:
             if not serialPause.is_set():
-                self.gui.status_serial.set('Serial input: RUNNING')
+                self.gui.status_serial.set('PCL input: RUNNING')
                 readfile = open(self.bufferfile, 'rb')
                 size_first_check = self.getSize(readfile)
                 if size_first_check == 0:
@@ -318,7 +320,7 @@ class SerialListener:
                         self.gui.status_bytes.set('Receiving data: (' + str(size_last_check) + ' bytes)')
             else:
                 time.sleep(0.2) # without a delay in an empty loop the output tends to interfere with the next line
-                self.gui.status_serial.set('Serial input: STOPPED')
+                self.gui.status_serial.set('PCL input: STOPPED')
                 self.logger.printConsole("Capture paused, idle.", newLine=False, animateDots=True)
 
     # clear the dump file on disk
@@ -577,6 +579,8 @@ class Logger:
                     print(justify_string.format(text_string), end='\r', flush=True)
                     if NATIVE_LOGGER == True and not logToGUI == False:
                         loggui.logLine(text_string)
+        # update the window anyway
+        self.gui.refresh()
 
 # input handling
 class Input(Logger, SerialListener):
@@ -667,6 +671,7 @@ class ArgHandler:
         parser.add_argument('-p', type=str, metavar='[/dev/ttyS0]', help="Override serial port", required=False)
         parser.add_argument('-s', type=int, metavar='[baud]', help="Override serial speed", required=False)
         parser.add_argument('-f', type=str, metavar='[/tmp/raw]', help="Override buffer file", required=False)
+        parser.add_argument('-o', type=str, metavar='[/tmp/tek2]', help="Override output directory", required=False)
         parser.add_argument('-v', '--version', help='Show version and exit', default=False, action='version', version=version)
         args = parser.parse_args()
 
@@ -686,6 +691,9 @@ class ArgHandler:
         if args.f:
             global BUFFER_FILE
             BUFFER_FILE = args.f
+        if args.o:
+            global FILE_DIR
+            FILE_DIR = args.o
 
 # main task launches the threads for the GUI, timer, input and serial listener
 def main():
@@ -709,9 +717,9 @@ def main():
     if not SERIAL_IGNORE == True:
         logger.printConsole("Executing any startup commands...")
         for command in COMMANDS_STARTUP:
+            time.sleep(COMMANDS_DELAY)
             logger.printConsole("Sending startup command " + command.replace('\r', '').replace('\n', '') + "...")
             serial.sendMessage(command=command)
-            time.sleep(COMMANDS_DELAY)
 
     # timer for serial monitor
     logger.printConsole("Starting timer thread...", startNewLine=True)

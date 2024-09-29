@@ -105,49 +105,50 @@
 
  Many parameters are currently only configurable in the script(s). If you need a specific parameter to be specified from the command line, open an Issue and it will be addressed. 
 
- `SERIAL_PORT = '/dev/ttyACM1'`                  # Serial port to use, can be overridden with `-p`
+| Parameter | Details |
+| --- | --- |
+| `SERIAL_PORT = '/dev/ttyACM1'` | Serial port to use, can be overridden with `-p` |
  
- `SERIAL_RATE = 115200`                          # BAUD rate used for the serial port, can be overridden with `-s`
+| `SERIAL_RATE = 115200` | BAUD rate used for the serial port, can be overridden with `-s` |
  
- `SERIAL_IGNORE = False`                         # bypass attaching to the serial interface, can be overridden to `True` by using `-n`
+| `SERIAL_IGNORE = False` | bypass attaching to the serial interface, can be overridden to `True` by using `-n` |
  
- `BUFFER_FILE = '/tmp/scope.dump'`               # data buffer file on disk, can be overridden with `-f`
+| `BUFFER_FILE = '/tmp/scope.dump'` | data buffer file on disk, can be overridden with `-f` |
  
- `KEEP_BUFFER = False`                           # keep the buffer (disk only) for debugging or batch jobs, can be overridden by using `-k`
+| `KEEP_BUFFER = False` | keep the buffer (disk only) for debugging or batch jobs, can be overridden by using `-k` |
  
- `TIMEOUT_S = 2`                                 # timeout before rendering job in seconds. You may need to increase this timeout for devices that have gaps in their output
+| `TIMEOUT_S = 2` | timeout before rendering job in seconds. You may need to increase this timeout for devices that have gaps in their output |
  
- `PCL_BINARY = '/usr/local/bin/gpcl6'`           # binary called to convert the PCL dump to another format. Can also be `hp2xx` if you're receiving HPGL. `gpcl6` is part of the Ghostscript suite
+| `PCL_BINARY = '/usr/local/bin/gpcl6'` | binary called to convert the PCL dump to another format. Can also be `hp2xx` if you're receiving HPGL. `gpcl6` is part of the Ghostscript suite |
  
- `PCL_ARGS = '-sDEVICE=pdfwrite -o '`            # optional arguments for above binary - use empty string for none
+| `PCL_ARGS = '-sDEVICE=pdfwrite -o '` | optional arguments for above binary - use empty string for none |
  
- `FILE_DIR = os.environ['HOME']`                 # location to render the resulting files
+| `FILE_DIR = os.environ['HOME']` | location to render the resulting files |
  
- `FILE_BASENAME = 'scope_output_'`               # file name prefix for rendered files
+| `FILE_BASENAME = 'scope_output_'` | file name prefix for rendered files |
  
- `FILE_VIEWER = 'firefox'`                       # command used to preview the rendered files when using non-native previews in PCL dump Pro and is the only preview available in PCL dump
+| `FILE_VIEWER = 'firefox'` | command used to preview the rendered files when using non-native previews in PCL dump Pro and is the only preview available in PCL dump |
  
- `CONV_FORMAT = 'pdf'`                           # file name suffix used for rendered files
+| `CONV_FORMAT = 'pdf'` | file name suffix used for rendered files |
  
- `PNG_PHOSPHOR = True`                           # use ImageMagick to convert PNG files to a phoshor look. Technically this can be used for any post-processing on the PDF/image
+| `PNG_PHOSPHOR = True` | use ImageMagick to convert PNG files to a phoshor look. Technically this can be used for any post-processing on the PDF/image |
  
- `PNG_PHOSPHOR_CMD = '/usr/bin/convert'`         # location of the ImageMagick binary for conversion. Any binary can be used
+| `PNG_PHOSPHOR_CMD = '/usr/bin/convert'` | location of the ImageMagick binary for conversion. Any binary can be used |
  
- `PNG_PHOSPHOR_ARGS = "-alpha on -fill \"#00EE00\" -draw 'color 0,0 replace' +level-colors green,black -auto-level"`  # arguments for phosphor conversion step
+| `PNG_PHOSPHOR_ARGS = "-alpha on -fill \"#00EE00\" -draw 'color 0,0 replace' +level-colors green,black -auto-level"` | arguments for phosphor conversion step |
  
- `PREVIEW = True`                                # whether to automatically preview rendered files when using PCL dump. Also used if `PREVIEW_NATIVE` is `False` in PCL dump Pro
+| `PREVIEW = True` | whether to automatically preview rendered files when using PCL dump. Also used if `PREVIEW_NATIVE` is `False` in PCL dump Pro |
  
- `OUTPUT_DATETIME = True`                        # prefix output with a date and time stamp in log output (GUI and CLI)
+| `OUTPUT_DATETIME = True` | prefix output with a date and time stamp in log output (GUI and CLI) |
  
- `PREVIEW_NATIVE = True`                         # enable or disable GUI automatic previews using the native preview functionality of the utility (PCL dump Pro)
+| `PREVIEW_NATIVE = True` | enable or disable GUI automatic previews using the native preview functionality of the utility (PCL dump Pro) |
  
- `PREVIEW_NATIVE_W = 544`                        # initial width to which to scale the image for native previewing 
+| `PREVIEW_NATIVE_W = 544` | initial width to which to scale the image for native previewing |
  
- `PREVIEW_NATIVE_H = 704`                        # initial height to which to scale the image for native previewing
+| `PREVIEW_NATIVE_H = 704` | initial height to which to scale the image for native previewing |
  
- `NATIVE_LOGGER = True`                          # whether to show the native logger output in the GUI. If the logger is disabled, it will be hidden from the main window (PCL dump Pro)
+| `NATIVE_LOGGER = True` | whether to show the native logger output in the GUI. If the logger is disabled, it will be hidden from the main window (PCL dump Pro) |
  
- `COMMANDS_STARTUP = ['++mode 0\r\n']`           # commands that are sent to the serial bus at startup
+| `COMMANDS_STARTUP = ['++mode 0\r\n']` | commands that are sent to the serial bus at startup |
  
- `COMMANDS_DELAY = 1.2`                          # delay between commands executed (sent) to the serial bus in seconds at startup
-
+| `COMMANDS_DELAY = 1.2` | delay between commands executed (sent) to the serial bus in seconds at startup |

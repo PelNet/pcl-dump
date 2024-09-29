@@ -192,6 +192,7 @@ def handleArgs():
     parser.add_argument('-p', type=str, metavar='[/dev/ttyS0]', help="Override serial port", required=False)
     parser.add_argument('-s', type=int, metavar='[baud]', help="Override serial speed", required=False)
     parser.add_argument('-f', type=str, metavar='[/tmp/raw]', help="Override buffer file", required=False)
+    parser.add_argument('-o', type=str, metavar='[/tmp/tek2]', help="Override output directory", required=False)
     parser.add_argument('-v', '--version', help='Show version and exit', default=False, action='version', version=version)
     args = parser.parse_args()
 
@@ -211,6 +212,9 @@ def handleArgs():
     if args.f:
         global BUFFER_FILE
         BUFFER_FILE = args.f
+    if args.o:
+        global FILE_DIR
+        FILE_DIR = args.o
 
 # store serial input
 def listenSerial(serialPause):
