@@ -58,6 +58,8 @@
  `-s [baudrate]`     Allows the serial baud rate to be specified manually. Often used in combination with `-p`.
  
  `-f [file]`         Overrides the buffer file used by the utility. Often used in combination with `-p` when running multiple instances.
+
+ `-o [dir]`          Overrides the configured output directory.
  
  `-v`                Prints the utility version and exits.
  
