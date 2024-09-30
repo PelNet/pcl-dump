@@ -117,7 +117,7 @@
 | `TIMEOUT_S = 2` | timeout before rendering job in seconds. You may need to increase this timeout for devices that have gaps in their output |
 | `PCL_BINARY = '/usr/local/bin/gpcl6'` | binary called to convert the PCL/HPGL dump to another format. Can also be `hp2xx` if you're receiving HPGL. `gpcl6` is part of the Ghostscript suite |
 | `PCL_ARGS = '-sDEVICE=pdfwrite -o '` | optional arguments for above binary - use empty string for none |
-| `FILE_DIR = os.environ['HOME']` | location to render the resulting files |
+| `FILE_DIR = os.environ['HOME']` | location to render the resulting files. Can be overridden by using `-o` |
 | `FILE_BASENAME = 'scope_output_'` | file name prefix for rendered files |
 | `FILE_VIEWER = 'firefox'` | command used to preview the rendered files when using non-native previews in Scope dump Pro and is the only preview available in Scope dump |
 | `CONV_FORMAT = 'pdf'` | file name suffix used for rendered files |
