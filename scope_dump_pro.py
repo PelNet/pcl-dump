@@ -45,7 +45,7 @@ import fitz                         # PDF support
 
 # config parameters
 SERIAL_PORT = '/dev/ttyACM1'                    # serial port to use
-SERIAL_RATE = 115200                            # BAUD rate. HP 54645D goes up to 19200, AR488 is at 115200:q
+SERIAL_RATE = 115200                            # BAUD rate. HP 54645D goes up to 19200, AR488 is at 115200
 SERIAL_IGNORE = False                           # bypass attaching to the serial interface
 BUFFER_FILE = '/tmp/scope.dump'                 # data buffer file on disk
 KEEP_BUFFER = False                             # keep the buffer (disk only), can be used for debugging or batch jobs
