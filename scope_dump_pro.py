@@ -184,6 +184,7 @@ class GUI(tk.Tk):
             "\n\n" + \
             "Hotkeys:  \n" + \
             "          [t]oggle scale factor in trace window \n" + \
+            " [Esc] or [q]uit trace in trace window \n" + \
             "  [F2] or [p]ause the serial polling service \n" + \
             "  [F3] or [r]esume the serial polling service \n" + \
             "  [F1] or [h]help dialog (this screen) \n" + \
