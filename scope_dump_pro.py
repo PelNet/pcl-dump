@@ -5,7 +5,7 @@
 # that the timer thread does not prematurely consider the print job to be complete. The delay after
 # which a job is finished can be set by adjusting TIMEOUT_S. Note that CTS/DTR and XON/XOF are not
 # handled or addressed currently. When a job is considered complete, a binary (gpcl6 from the
-# Ghostscript project is currently used) is called to convert the PCL datafile into a human
+# Ghostscript project is currently used) is called to convert the PCL/HPGL datafile into a human
 # readable format. While logic is in place for byte-by-byte parsing in order to detect discrete
 # beginning and endings of jobs, these do not appear to exist, or come in the shape of out-of-band
 # signalling on the serial line.
@@ -17,8 +17,8 @@
 #
 # ## Pro
 #
-# PCL dump Pro builds on the original PCL dump utility, but featuring a GUI for mouse,
-# touchscreen or hotkey input. While STDOUT and STDERR remain identical to PCL dump, plus focuses on
+# Scope dump Pro builds on the original PCL dump utility, but featuring a GUI for mouse,
+# touchscreen or hotkey input. While STDOUT and STDERR remain identical to Scope dump, Pro focuses on
 # presenting all typically useful output to the GUI, too. It allows (single page) PDF and PNG files
 # to be previewed directly when received or from saved traces on disk. PDF is highly recommended.
 # It features a modular, class based approach while remaining identical in functionality.
@@ -50,7 +50,7 @@ SERIAL_IGNORE = False                           # bypass attaching to the serial
 BUFFER_FILE = '/tmp/scope.dump'                 # data buffer file on disk
 KEEP_BUFFER = False                             # keep the buffer (disk only), can be used for debugging or batch jobs
 TIMEOUT_S = 2                                   # timeout before rendering job in seconds
-PCL_BINARY = '/usr/local/bin/gpcl6'             # binary called to convert the PCL dump to another format
+PCL_BINARY = '/usr/local/bin/gpcl6'             # binary called to convert the PCL/HPGL dump to another format
 PCL_ARGS = '-sDEVICE=pdfwrite -o '              # optional arguments for above binary - use empty string for none
 #PCL_ARGS = '-sDEVICE=pngalpha -r128 -dGraphicsAlphaBits=4 -o '
 FILE_DIR = os.environ['HOME']                   # location to render the resulting files
@@ -73,7 +73,7 @@ COMMANDS_DELAY = 1.2                            # delay between commands execute
 # global events for pausing/resuming capture and closing trace windows
 serialPause = Event()
 eventCloseTraces = Event()
-version = 'Pro 1.1'
+version = 'Pro 1.2'
 
 ### GUI class
 class GUI(tk.Tk):
@@ -100,7 +100,7 @@ class GUI(tk.Tk):
             self.text_area.grid(column = 0, pady = 10, padx = 0)
             logger_frame.grid(row=1, column=0, columnspan=2)
 
-        root.title("PCL dump " + version)  # title of the GUI window
+        root.title("Scope dump " + version)  # title of the GUI window
         root.resizable(0, 0)
         root.config(width=1000, height=600)
         #root.maxsize(900, 600)  # specify the max size the window can expand to
@@ -114,7 +114,7 @@ class GUI(tk.Tk):
         right_frame.grid(row=0, column=1, padx=10, pady=5)
 
         # create labels in left_frame
-        tk.Label(left_frame, text="PCL dump " + version).grid(row=0, column=0, padx=5, pady=5)
+        tk.Label(left_frame, text="Scope dump " + version).grid(row=0, column=0, padx=5, pady=5)
 
         # load image
         image_logo = Image.open('logo.jpg')
@@ -129,11 +129,11 @@ class GUI(tk.Tk):
 
         # buttons
         tk.Button(tool_bar, text="Open trace", command=lambda: self.openTrace(), width=10, underline=0).grid(row=1, column=0, padx=5, pady=4)
-        tk.Button(tool_bar, text="Start serial", command=lambda: input.serialControl(command='start'), width=10, underline=3).grid(row=2, column=0, padx=5, pady=4)
+        tk.Button(tool_bar, text="Start capture", command=lambda: input.serialControl(command='start'), width=10, underline=3).grid(row=2, column=0, padx=5, pady=4)
         tk.Button(tool_bar, text="Help / About", command=lambda: self.displayAbout(), width=10, underline=0).grid(row=3, column=0, padx=5, pady=4)
         tk.Button(tool_bar, text="Quit", command=lambda: self.quitApplication(), width=10, underline=0).grid(row=3, column=1, padx=5, pady=4)
         tk.Button(tool_bar, text="Close traces", command=lambda: self.closeTraces(), width=10, underline=0).grid(row=1, column=1, padx=5, pady=4)
-        tk.Button(tool_bar, text="Stop serial", command=lambda: input.serialControl(command='stop'), width=10, underline=3).grid(row=2, column=1, padx=5, pady=4)
+        tk.Button(tool_bar, text="Stop capture", command=lambda: input.serialControl(command='stop'), width=10, underline=3).grid(row=2, column=1, padx=5, pady=4)
 
         #status_window = tk.Label(tool_bar, text='', background='white', width=30, height=7).grid(row=6, column=0, padx=10, pady=10)
         label_status = tk.Label(tool_bar, textvariable=str(self.status_serial), width=25, height=1, background='black', foreground='#0F0', font=("TkFixedFont", 12)).grid(row=7, column=0, padx=10, pady=8, columnspan=2)
@@ -175,11 +175,11 @@ class GUI(tk.Tk):
     # display help / about GUI dialog
     def displayAbout(self):
         tk.Tk().withdraw()
-        mb.showinfo(title="PCL dump " + version, message="PCL dump " + version, detail=\
-            "The PCL dump (plus) utility is intended to provide a simple " + \
-            "frontend for the PCL dump service. Traces can be automatically " + \
+        mb.showinfo(title="Scope dump " + version, message="Scope dump " + version, detail=\
+            "The Scope dump (plus) utility is intended to provide a simple " + \
+            "frontend for the PCL/HPGL dump service. Traces can be automatically " + \
             "previewed natively and the timestamp of the last trace is retained.\n" + \
-            "PCL dump also indicates the current status of the serial polling " + \
+            "Scope dump also indicates the current status of the serial polling " + \
             "mechanism and the progress of any incoming job in bytes.\n"
             "\n\n" + \
             "Hotkeys:  \n" + \
@@ -194,7 +194,7 @@ class GUI(tk.Tk):
     # quit dialog for GUI
     def quitApplication(self):
         tk.Tk().withdraw()
-        res = mb.askquestion('Exit PCL dump', 'Do you want to exit the program?')
+        res = mb.askquestion('Exit Scope dump', 'Do you want to exit the program?')
         if res == 'yes' :
             os._exit(0)
 
@@ -297,7 +297,7 @@ class SerialListener:
         self.gui = gui
         while True:
             if not serialPause.is_set():
-                self.gui.status_serial.set('PCL input: RUNNING')
+                self.gui.status_serial.set('Capture input: RUNNING')
                 readfile = open(self.bufferfile, 'rb')
                 size_first_check = self.getSize(readfile)
                 if size_first_check == 0:
@@ -320,7 +320,7 @@ class SerialListener:
                         self.gui.status_bytes.set('Receiving data: (' + str(size_last_check) + ' bytes)')
             else:
                 time.sleep(0.2) # without a delay in an empty loop the output tends to interfere with the next line
-                self.gui.status_serial.set('PCL input: STOPPED')
+                self.gui.status_serial.set('Capture input: STOPPED')
                 self.logger.printConsole("Capture paused, idle.", newLine=False, animateDots=True)
 
     # clear the dump file on disk
@@ -349,7 +349,7 @@ class Trace():
         try:
             subprocess.check_output(render_command, shell=True)
         except subprocess.CalledProcessError as err:
-            self.logger.printConsole("ERROR: Failed to decode PCL using \"" + PCL_BINARY + "\" with error " + str(err) + "!", startNewLine=True)
+            self.logger.printConsole("ERROR: Failed to decode data using \"" + PCL_BINARY + "\" with error " + str(err) + "!", startNewLine=True)
         if CONV_FORMAT == 'png' and PNG_PHOSPHOR == True:
             self.logger.printConsole("Phosphor PNG mode enabled, processing...", startNewLine=True)
             try:
@@ -435,8 +435,7 @@ class Trace():
             zoom = 1
             mat = fitz.Matrix(zoom, zoom)
         except:
-            mb.showwarning(title="PCL dump " + version, detail="Failed to open PDF file")
-            #window.destroy()
+            mb.showwarning(title="Scope dump " + version, detail="Failed to open PDF file")
 
         # generate an image from the PDF page
         def pdf_to_img(page_num):
@@ -446,8 +445,7 @@ class Trace():
                     pix = page.get_pixmap(matrix=mat)
                     return Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
                 except:
-                    mb.showwarning(title="PCL dump " + version, detail="Failed to render PDF file",parent=window)
-                    #window.destroy()
+                    mb.showwarning(title="Scope dump " + version, detail="Failed to render PDF file",parent=window)
             else:
                 pass
 
@@ -657,7 +655,7 @@ class Input(Logger, SerialListener):
 
     # display utility version
     def displayVersion(self):
-        self.logger.printConsole("HP PCL dump - version " + version, startNewLine=True)
+        self.logger.printConsole("Scope dump - version " + version, startNewLine=True)
         return
 
 class ArgHandler:
@@ -665,7 +663,7 @@ class ArgHandler:
     # handle command args
     def handleArgs(event):
         global version
-        parser = argparse.ArgumentParser(description="PCL dump")
+        parser = argparse.ArgumentParser(description="Scope dump")
         parser.add_argument('-n', help='Ignore serial port absence', action="store_true")
         parser.add_argument('-k', help='Keep buffer on disk', action="store_true")
         parser.add_argument('-p', type=str, metavar='[/dev/ttyS0]', help="Override serial port", required=False)

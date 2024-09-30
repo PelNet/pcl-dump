@@ -49,7 +49,7 @@ COMMANDS_DELAY = 1.2                            # delay between commands execute
 
 # global event for pausing/resuming capture
 serialPause = Event()
-version = '1.0'
+version = '1.1'
 
 # get the size of the dumpfile on disk
 def getSize(fileobject):
@@ -91,7 +91,7 @@ def renderFile():
     try:
         subprocess.check_output(render_command, shell=True)
     except subprocess.CalledProcessError as err:
-        printConsole("ERROR: Failed to decode PCL using \"" + PCL_BINARY + "\" with error " + str(err) + "!", startNewLine=True, newLine=True)
+        printConsole("ERROR: Failed to decode PCL/HPGL using \"" + PCL_BINARY + "\" with error " + str(err) + "!", startNewLine=True, newLine=True)
     if CONV_FORMAT == 'png' and PNG_PHOSPHOR == True:
         printConsole("Phosphor PNG mode enabled, processing...", startNewLine=True)
         try:
@@ -186,7 +186,7 @@ def handleInput():
 # handle command args
 def handleArgs():
     global version
-    parser = argparse.ArgumentParser(description="PCL dump")
+    parser = argparse.ArgumentParser(description="Scope dump")
     parser.add_argument('-n', help='Ignore serial port absence', action="store_true")
     parser.add_argument('-k', help='Keep buffer on disk', action="store_true")
     parser.add_argument('-p', type=str, metavar='[/dev/ttyS0]', help="Override serial port", required=False)
@@ -275,7 +275,7 @@ def displayHelp():
 
 # display utility version
 def displayVersion():
-    printConsole("HP PCL dump - version " + version, startNewLine=True)
+    printConsole("Scope dump - version " + version, startNewLine=True)
 
 # main task launches the threads for the timer, input and serial listener
 def main():
